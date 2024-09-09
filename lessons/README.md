@@ -1,4 +1,4 @@
-# New blog post - https://medium.com/@jcroyoaun/
+# New blog post - https://medium.com/@jcroyoaun/my-quick-typescript-setup-guide-748437193d64
 
 ![image](https://github.com/user-attachments/assets/3222846d-6463-45fd-9ee6-df5d41474878)
 
