@@ -5,4 +5,8 @@
 # Playlists
 
 # Contents
-📚 - (!lessons|https://github.com/jcroyoaun/tutorials/tree/master/lessons)
+📚 - -[Lessons](https://github.com/jcroyoaun/tutorials/tree/master/lessons)
+
+# Social
+💼 - [LinkedIn](https://www.linkedin.com/in/jcroyoaun/)
+🛠️ - [Twitter/X](https://x.com/jcroyoaun)
