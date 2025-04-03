@@ -1,0 +1,46 @@
+{{- if eq .Release.Name "postgres" }}
+{{- if eq (.Values.service.dbConnection | default .Values.global.dbConnection | default "k8s") "k8s" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "service.fullname" . }}
+  labels:
+    app: {{ include "service.fullname" . }}
+spec:
+  serviceName: {{ include "service.fullname" . }}
+  replicas: {{ .Values.service.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ include "service.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "service.fullname" . }}
+    spec:
+      {{- with .Values.service.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "service.fullname" . }}
+          image: "{{ .Values.service.container.image }}:{{ .Values.global.tag | default "latest" }}"
+          ports:
+            - containerPort: {{ .Values.service.container.port }}
+          {{- with .Values.service.container.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.service.container.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.service.container.envFrom }}
+          envFrom:
+            {{- toYaml .Values.service.container.envFrom | nindent 12 }}
+          {{- end }}
+          {{- with .Values.service.container.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}

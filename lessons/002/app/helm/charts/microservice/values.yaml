@@ -1,0 +1,46 @@
+global:
+  imageRegistry: ""
+
+base-ingress:
+  enabled: true
+
+service:
+  serviceAccount:
+    enabled: false
+    annotations: {}
+  name: ""  
+  version: ""
+  env: ""
+  replicas: 1
+  dbConnection: "" 
+
+  container:
+    tag: latest
+    image: ""
+    port: 4000
+    env: {}
+    resources:
+      limits:
+        cpu: "1"
+        memory: "1500Mi"
+      requests:
+        cpu: "1"
+        memory: "1500Mi"
+    probes:
+      startup:
+        path: /v1/healthcheck
+        failureThreshold: 11
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      liveness:
+        path: /v1/healthcheck
+        failureThreshold: 3
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+
+
+  ingress:
+    enabled: false

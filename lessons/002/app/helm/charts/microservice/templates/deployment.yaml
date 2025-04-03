@@ -1,0 +1,88 @@
+{{- if ne .Release.Name "postgres" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "service.fullname" . }}
+  labels:
+    app: {{ include "service.fullname" . }}
+spec:
+  replicas: {{ .Values.service.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: {{ include "service.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "service.fullname" . }}
+    spec:
+      {{- if eq (.Values.service.dbConnection | default .Values.global.dbConnection | default "k8s") "k8s" }}
+      initContainers:
+      - name: wait-for-db
+        image: postgres:13
+        command:
+        - 'sh'
+        - '-c'
+        - >
+          until pg_isready -h postgres-svc.postgres.svc.cluster.local -p 5432; do
+            echo "waiting for database";
+            sleep 2;
+          done;
+      {{- end }}
+      containers:
+        - name: {{ include "service.fullname" . }}
+          image: "{{ .Values.service.container.image }}:latest"
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: {{ .Values.service.container.port }}
+          {{- with .Values.service.container.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.service.container.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.service.container.envFrom }}
+          envFrom:
+            {{- toYaml .Values.service.container.envFrom | nindent 12 }}
+          {{- end }}
+          {{- if .Values.service.container.probes.startup }}
+          startupProbe:
+            {{- if .Values.service.container.probes.startup.tcpSocket }}
+            tcpSocket:
+              port: {{ .Values.service.container.port }}
+            {{- else }}
+            httpGet:
+              path: {{ .Values.service.container.probes.startup.path }}
+              port: {{ .Values.service.container.port }}
+            {{- end }}
+            failureThreshold: {{ .Values.service.container.probes.startup.failureThreshold | default 11 }}
+            initialDelaySeconds: {{ .Values.service.container.probes.startup.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.service.container.probes.startup.periodSeconds | default 5 }}
+            successThreshold: {{ .Values.service.container.probes.startup.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.service.container.probes.startup.timeoutSeconds | default 1 }}
+          {{- end }}
+          {{- if .Values.service.container.probes.liveness }}
+          livenessProbe:
+            {{- if .Values.service.container.probes.liveness.tcpSocket }}
+            tcpSocket:
+              port: {{ .Values.service.container.port }}
+            {{- else }}
+            httpGet:
+              path: {{ .Values.service.container.probes.liveness.path }}
+              port: {{ .Values.service.container.port }}
+            {{- end }}
+            failureThreshold: {{ .Values.service.container.probes.liveness.failureThreshold | default 3 }}
+            periodSeconds: {{ .Values.service.container.probes.liveness.periodSeconds | default 5 }}
+            successThreshold: {{ .Values.service.container.probes.liveness.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.service.container.probes.liveness.timeoutSeconds | default 1 }}
+          {{- end }}
+          {{- with .Values.service.container.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.service.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

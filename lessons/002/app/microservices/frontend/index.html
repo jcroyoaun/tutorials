@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Library</title>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Heroicons (for icons) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.9/cdn.min.js" defer></script>
+    <!-- Toast notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+    <style>
+        /* CSS remains the same */
+        .tag-pills span:hover {
+            background-color: #e2e8f0;
+            cursor: pointer;
+        }
+        .lds-ring {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border: 8px solid #3b82f6;
+            border-radius: 50%;
+            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #3b82f6 transparent transparent transparent;
+        }
+        .lds-ring div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+        .lds-ring div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+        .lds-ring div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+        @keyframes lds-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="{ modalOpen: false, currentExercise: null }">
+    <!-- HTML structure remains the same -->
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        <span class="ml-2 text-white text-xl font-bold">Exercise Library</span>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button 
+                        @click="modalOpen = true; currentExercise = null;" 
+                        class="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        Add Exercise
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Filters and Search -->
+        <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Filter Exercises</h2>
+            
+            <form hx-get="/v1/exercises" hx-target="#exercises-content" hx-indicator="#loading" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Exercise Name</label>
+                        <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="primaryMuscles" class="block text-sm font-medium text-gray-700">Primary Muscles</label>
+                        <select name="primaryMuscles" id="primaryMuscles" multiple class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="Chest">Chest</option>
+                            <option value="Back">Back</option>
+                            <option value="Quads">Quads</option>
+                            <option value="Hamstrings">Hamstrings</option>
+                            <option value="Glutes">Glutes</option>
+                            <option value="AnteriorDelts">Anterior Delts</option>
+                            <option value="LateralDelts">Lateral Delts</option>
+                            <option value="PosteriorDelts">Posterior Delts</option>
+                            <option value="Biceps">Biceps</option>
+                            <option value="Triceps">Triceps</option>
+                            <option value="Forearms">Forearms</option>
+                            <option value="Abs">Abs</option>
+                            <option value="Calves">Calves</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                    </div>
+                    
+                    <div>
+                        <label for="secondaryMuscles" class="block text-sm font-medium text-gray-700">Secondary Muscles</label>
+                        <select name="secondaryMuscles" id="secondaryMuscles" multiple class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="Chest">Chest</option>
+                            <option value="Back">Back</option>
+                            <option value="Quads">Quads</option>
+                            <option value="Hamstrings">Hamstrings</option>
+                            <option value="Glutes">Glutes</option>
+                            <option value="AnteriorDelts">Anterior Delts</option>
+                            <option value="LateralDelts">Lateral Delts</option>
+                            <option value="PosteriorDelts">Posterior Delts</option>
+                            <option value="Biceps">Biceps</option>
+                            <option value="Triceps">Triceps</option>
+                            <option value="Forearms">Forearms</option>
+                            <option value="Abs">Abs</option>
+                            <option value="Calves">Calves</option>
+                            <option value="Erectors">Erectors</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        hx-get="/v1/exercises" 
+                        hx-target="#exercises-content"
+                        hx-indicator="#loading"
+                        onclick="document.querySelector('form').reset();">
+                        Reset Filters
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Apply Filters
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="htmx-indicator flex justify-center my-8">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+
+        <!-- Exercise List -->
+        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Exercises</h2>
+            </div>
+            
+            <div id="exercises-content" class="divide-y divide-gray-200">
+                <!-- Content will be loaded via HTMX -->
+                <div class="p-8 text-center text-gray-500">
+                    Loading exercises...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Exercise Modal -->
+    <div x-show="modalOpen" class="fixed z-10 inset-0 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg font-medium text-gray-900" x-text="currentExercise ? 'Edit Exercise' : 'Add New Exercise'"></h3>
+                    
+                    <form id="exercise-form" class="mt-4 space-y-4" hx-post="/v1/exercises" hx-target="#exercises-content" hx-swap="innerHTML">
+                        <input type="hidden" name="id" x-bind:value="currentExercise?.id">
+                        
+                        <div>
+                            <label for="form-name" class="block text-sm font-medium text-gray-700">Exercise Name</label>
+                            <input type="text" name="name" id="form-name" x-bind:value="currentExercise?.name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        
+                        <div>
+                            <label for="form-primary" class="block text-sm font-medium text-gray-700">Primary Muscles</label>
+                            <select name="primaryMuscles" id="form-primary" multiple class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="Chest">Chest</option>
+                                <option value="Back">Back</option>
+                                <option value="Quads">Quads</option>
+                                <option value="Hamstrings">Hamstrings</option>
+                                <option value="Glutes">Glutes</option>
+                                <option value="AnteriorDelts">Anterior Delts</option>
+                                <option value="LateralDelts">Lateral Delts</option>
+                                <option value="PosteriorDelts">Posterior Delts</option>
+                                <option value="Biceps">Biceps</option>
+                                <option value="Triceps">Triceps</option>
+                                <option value="Forearms">Forearms</option>
+                                <option value="Abs">Abs</option>
+                                <option value="Calves">Calves</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                        </div>
+                        
+                        <div>
+                            <label for="form-secondary" class="block text-sm font-medium text-gray-700">Secondary Muscles</label>
+                            <select name="secondaryMuscles" id="form-secondary" multiple class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Chest">Chest</option>
+                                <option value="Back">Back</option>
+                                <option value="Quads">Quads</option>
+                                <option value="Hamstrings">Hamstrings</option>
+                                <option value="Glutes">Glutes</option>
+                                <option value="AnteriorDelts">Anterior Delts</option>
+                                <option value="LateralDelts">Lateral Delts</option>
+                                <option value="PosteriorDelts">Posterior Delts</option>
+                                <option value="Biceps">Biceps</option>
+                                <option value="Triceps">Triceps</option>
+                                <option value="Forearms">Forearms</option>
+                                <option value="Abs">Abs</option>
+                                <option value="Calves">Calves</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button x-show="!currentExercise" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="submitExerciseForm()">
+                        Add Exercise
+                    </button>
+                    <button x-show="currentExercise" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="updateExercise()">
+                        Update Exercise
+                    </button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        @click="modalOpen = false">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // This approach uses a completely different method for handling events
+    // using event delegation
+    
+    function createMuscleTag(muscle) {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800';
+        span.textContent = muscle;
+        span.dataset.muscle = muscle;
+        return span;
+    }
+
+    // Event delegation for muscle tags
+    document.addEventListener('click', function(e) {
+        if (e.target.matches('.tag-pills span')) {
+            const muscle = e.target.dataset.muscle;
+            document.getElementById('name').value = '';
+            const isPrimary = document.querySelector(`#primaryMuscles option[value="${muscle}"]`);
+            if (isPrimary) {
+                const select = document.getElementById('primaryMuscles');
+                Array.from(select.options).forEach(opt => opt.selected = false);
+                isPrimary.selected = true;
+            }
+            document.querySelector('form button[type="submit"]').click();
+        }
+    });
+
+    // New approach: Direct DOM manipulation
+    function renderExercises(exercises) {
+        const container = document.getElementById('exercises-content');
+        
+        if (!exercises || exercises.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-gray-500">No exercises found</div>';
+            return;
+        }
+        
+        // Clear previous content
+        container.innerHTML = '';
+        
+        exercises.forEach(exercise => {
+            // Create the exercise card
+            const card = document.createElement('div');
+            card.className = 'p-6 hover:bg-gray-50 exercise-card';
+            card.dataset.exerciseId = exercise.id;
+            
+            // Create the top section with name and buttons
+            const topSection = document.createElement('div');
+            topSection.className = 'flex justify-between';
+            
+            // Add the exercise name
+            const name = document.createElement('h3');
+            name.className = 'text-lg font-medium text-gray-900 exercise-name';
+            name.textContent = exercise.name;
+            topSection.appendChild(name);
+            
+            // Add the buttons container
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'flex space-x-2';
+            
+            // Add edit button with SVG
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn text-blue-600 hover:text-blue-800';
+            editBtn.setAttribute('data-id', exercise.id);
+            editBtn.setAttribute('data-exercise', JSON.stringify(exercise));
+            editBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+            `;
+            buttonContainer.appendChild(editBtn);
+            
+            // Add delete button with SVG
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn text-red-600 hover:text-red-800';
+            deleteBtn.setAttribute('data-id', exercise.id);
+            deleteBtn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            `;
+            buttonContainer.appendChild(deleteBtn);
+            
+            topSection.appendChild(buttonContainer);
+            card.appendChild(topSection);
+            
+            // Add primary muscles section
+            const primarySection = document.createElement('div');
+            primarySection.className = 'mt-3';
+            
+            const primaryLabel = document.createElement('div');
+            primaryLabel.className = 'text-sm text-gray-500';
+            primaryLabel.textContent = 'Primary Muscles:';
+            primarySection.appendChild(primaryLabel);
+            
+            const primaryContainer = document.createElement('div');
+            primaryContainer.className = 'mt-1 flex flex-wrap gap-1 primary-muscles tag-pills';
+            
+            if (exercise.primaryMuscles && exercise.primaryMuscles.length > 0) {
+                exercise.primaryMuscles.forEach(muscle => {
+                    primaryContainer.appendChild(createMuscleTag(muscle));
+                });
+            }
+            
+            primarySection.appendChild(primaryContainer);
+            card.appendChild(primarySection);
+            
+            // Add secondary muscles section
+            const secondarySection = document.createElement('div');
+            secondarySection.className = 'mt-3';
+            
+            const secondaryLabel = document.createElement('div');
+            secondaryLabel.className = 'text-sm text-gray-500';
+            secondaryLabel.textContent = 'Secondary Muscles:';
+            secondarySection.appendChild(secondaryLabel);
+            
+            const secondaryContainer = document.createElement('div');
+            secondaryContainer.className = 'mt-1 flex flex-wrap gap-1 secondary-muscles tag-pills';
+            
+            if (exercise.secondaryMuscles && exercise.secondaryMuscles.length > 0) {
+                exercise.secondaryMuscles.forEach(muscle => {
+                    secondaryContainer.appendChild(createMuscleTag(muscle));
+                });
+            }
+            
+            secondarySection.appendChild(secondaryContainer);
+            card.appendChild(secondarySection);
+            
+            // Add the complete card to the container
+            container.appendChild(card);
+        });
+        
+        console.log('Rendered', exercises.length, 'exercises');
+    }
+
+    // Event delegation for edit and delete buttons
+    document.getElementById('exercises-content').addEventListener('click', function(e) {
+        // Handle edit button click
+        if (e.target.closest('.edit-btn')) {
+            const btn = e.target.closest('.edit-btn');
+            const exerciseData = JSON.parse(btn.getAttribute('data-exercise'));
+            console.log('Edit clicked for:', exerciseData);
+            editExercise(exerciseData);
+        }
+        
+        // Handle delete button click
+        if (e.target.closest('.delete-btn')) {
+            const btn = e.target.closest('.delete-btn');
+            const id = btn.getAttribute('data-id');
+            console.log('Delete clicked for ID:', id);
+            deleteExercise(id);
+        }
+    });
+
+    // Process API response
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial load of exercises
+        htmx.ajax('GET', '/v1/exercises', {target: '#exercises-content'});
+
+        // Process the response and render exercises
+        htmx.on('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'exercises-content') {
+                try {
+                    console.log('Processing response');
+                    const responseText = event.detail.xhr.responseText;
+                    console.log('Response text:', responseText.slice(0, 100) + '...');
+                    
+                    const response = JSON.parse(responseText);
+                    const exercises = response.exercises || [];
+                    
+                    console.log('Parsed', exercises.length, 'exercises');
+                    renderExercises(exercises);
+                } catch (e) {
+                    console.error('Error processing response:', e);
+                    event.detail.target.innerHTML = `<div class="p-8 text-center text-gray-500">Error loading exercises: ${e.message}</div>`;
+                }
+            }
+        });
+    });
+
+    // Edit exercise function
+    function editExercise(exercise) {
+        console.log('Editing exercise:', exercise);
+        
+        // Try different approaches to set Alpine data
+        try {
+            // Try using Alpine global methods first (newer versions)
+            if (typeof Alpine !== 'undefined' && Alpine.$data) {
+                const element = document.querySelector('[x-data]');
+                Alpine.$data(element).currentExercise = exercise;
+                Alpine.$data(element).modalOpen = true;
+            } 
+            // Fall back to direct Alpine data access
+            else if (document.querySelector('[x-data]').__x) {
+                document.querySelector('[x-data]').__x.$data.currentExercise = exercise;
+                document.querySelector('[x-data]').__x.$data.modalOpen = true;
+            }
+            // Last resort - direct DOM manipulation
+            else {
+                // Store the data in a global variable as fallback
+                window.currentEditExercise = exercise;
+                // Show the modal manually
+                const modal = document.querySelector('.fixed.z-10.inset-0.overflow-y-auto');
+                if (modal) modal.style.display = 'block';
+            }
+        } catch (e) {
+            console.error('Error setting Alpine data:', e);
+            // Store the data in a global variable as fallback
+            window.currentEditExercise = exercise;
+            // Show the modal manually
+            const modal = document.querySelector('.fixed.z-10.inset-0.overflow-y-auto');
+            if (modal) modal.style.display = 'block';
+        }
+        
+        // Set form values
+        setTimeout(() => {
+            document.getElementById('form-name').value = exercise.name;
+            
+            // Set primary muscles
+            const primarySelect = document.getElementById('form-primary');
+            Array.from(primarySelect.options).forEach(option => {
+                option.selected = exercise.primaryMuscles && exercise.primaryMuscles.includes(option.value);
+            });
+            
+            // Set secondary muscles
+            const secondarySelect = document.getElementById('form-secondary');
+            Array.from(secondarySelect.options).forEach(option => {
+                option.selected = exercise.secondaryMuscles && exercise.secondaryMuscles.includes(option.value);
+            });
+        }, 50);
+    }
+
+
+
+    // Submit exercise form
+    function submitExerciseForm() {
+        const form = document.getElementById('exercise-form');
+        const formData = new FormData(form);
+        
+        // Convert to JSON object
+        const jsonData = {
+            name: formData.get('name') || '',
+            primaryMuscles: [],
+            secondaryMuscles: []
+        };
+        
+        // Get all selected values from multi-select fields
+        const primarySelect = document.getElementById('form-primary');
+        Array.from(primarySelect.selectedOptions).forEach(option => {
+            jsonData.primaryMuscles.push(option.value);
+        });
+        
+        const secondarySelect = document.getElementById('form-secondary');
+        Array.from(secondarySelect.selectedOptions).forEach(option => {
+            jsonData.secondaryMuscles.push(option.value);
+        });
+
+        console.log('Submitting:', jsonData);
+        
+        // Make the API call
+        fetch('/v1/exercises', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Error adding exercise');
+            return response.json();
+        })
+        .then(data => {
+            // Close the modal
+            document.querySelector('[x-data]').__x.$data.modalOpen = false;
+            
+            // Refresh exercise list
+            htmx.ajax('GET', '/v1/exercises', {target: '#exercises-content'});
+            
+            // Show success notification
+            Toastify({
+                text: "Exercise added successfully!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#10B981",
+            }).showToast();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "Error adding exercise",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#EF4444",
+            }).showToast();
+        });
+    }
+
+    // Update exercise function
+    function updateExercise() {
+        console.log('Update exercise function called');
+        
+        // Get the current exercise ID, trying different approaches
+        let currentExercise;
+        
+        try {
+            // Try Alpine global methods first
+            if (typeof Alpine !== 'undefined' && Alpine.$data) {
+                currentExercise = Alpine.$data(document.querySelector('[x-data]')).currentExercise;
+            } 
+            // Fall back to direct Alpine data access
+            else if (document.querySelector('[x-data]').__x) {
+                currentExercise = document.querySelector('[x-data]').__x.$data.currentExercise;
+            }
+            // Last resort - use global variable
+            else if (window.currentEditExercise) {
+                currentExercise = window.currentEditExercise;
+            }
+        } catch (e) {
+            console.error('Error getting current exercise:', e);
+            if (window.currentEditExercise) {
+                currentExercise = window.currentEditExercise;
+            }
+        }
+        
+        if (!currentExercise || !currentExercise.id) {
+            console.error("No exercise ID found for update");
+            Toastify({
+                text: "Error: Couldn't identify which exercise to update",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#EF4444",
+            }).showToast();
+            return;
+        }
+        
+        const form = document.getElementById('exercise-form');
+        const formData = new FormData(form);
+        
+        // Convert to JSON object
+        const jsonData = {
+            name: formData.get('name') || '',
+            primaryMuscles: [],
+            secondaryMuscles: []
+        };
+        
+        // Get all selected values from multi-select fields
+        const primarySelect = document.getElementById('form-primary');
+        Array.from(primarySelect.selectedOptions).forEach(option => {
+            jsonData.primaryMuscles.push(option.value);
+        });
+        
+        const secondarySelect = document.getElementById('form-secondary');
+        Array.from(secondarySelect.selectedOptions).forEach(option => {
+            jsonData.secondaryMuscles.push(option.value);
+        });
+        
+        console.log(`Updating exercise ${currentExercise.id} with:`, jsonData);
+        
+        // Make the API call with PATCH method
+        fetch(`/v1/exercises/${currentExercise.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        })
+        .then(response => {
+            console.log('Update response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`Error updating exercise (${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Update successful:', data);
+            
+            // Close the modal, trying different approaches
+            try {
+                if (typeof Alpine !== 'undefined' && Alpine.$data) {
+                    Alpine.$data(document.querySelector('[x-data]')).modalOpen = false;
+                } else if (document.querySelector('[x-data]').__x) {
+                    document.querySelector('[x-data]').__x.$data.modalOpen = false;
+                } else {
+                    const modal = document.querySelector('.fixed.z-10.inset-0.overflow-y-auto');
+                    if (modal) modal.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error closing modal:', e);
+                const modal = document.querySelector('.fixed.z-10.inset-0.overflow-y-auto');
+                if (modal) modal.style.display = 'none';
+            }
+            
+            // Clear the global variable if it exists
+            if (window.currentEditExercise) {
+                window.currentEditExercise = null;
+            }
+            
+            // Refresh exercise list
+            htmx.ajax('GET', '/v1/exercises', {target: '#exercises-content'});
+            
+            // Show success notification
+            Toastify({
+                text: "Exercise updated successfully!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#10B981",
+            }).showToast();
+        })
+        .catch(error => {
+            console.error('Error updating:', error);
+            Toastify({
+                text: `Error updating exercise: ${error.message}`,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#EF4444",
+            }).showToast();
+        });
+    }
+
+    // Delete exercise function
+    function deleteExercise(id) {
+        console.log('Delete function called with ID:', id);
+        
+        if (!id) {
+            console.error("No exercise ID provided for deletion");
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to delete this exercise?')) return;
+        
+        console.log(`Deleting exercise with ID: ${id}`);
+        
+        fetch(`/v1/exercises/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            console.log('Delete response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`Error deleting exercise (${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Delete successful:', data);
+            
+            // Refresh exercise list
+            htmx.ajax('GET', '/v1/exercises', {target: '#exercises-content'});
+            
+            // Show success notification
+            Toastify({
+                text: "Exercise deleted successfully!",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#10B981",
+            }).showToast();
+        })
+        .catch(error => {
+            console.error('Error deleting:', error);
+            Toastify({
+                text: `Error deleting exercise: ${error.message}`,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#EF4444",
+            }).showToast();
+        });
+    }
+    
+    </script>
+</body>
+</html>

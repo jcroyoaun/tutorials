@@ -1,0 +1,93 @@
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# TypeScript
+*.tsbuildinfo
+
+# CDK
+cdk.out/
+.cdk.staging/
+cdk.context.json
+
+# Go
+/bin/
+/vendor/
+*.exe
+*.test
+*.prof
+*.out
+
+# Docker
+.docker/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Helm
+.helm/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+build/
+dist/
+out/
+*.zip
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+.cache/
+.temp/
+tmp/
+
+# Sensitive information
+*.pem
+*.key
+*.p12
+*credentials*
+*secret*
+*password*
+*token*
+
+# Project specific
+# Infrastructure
+infra/cdk.out/
+infra/cdk.context.json
+infra/.cdk.staging/
+
+# Migrations (if you don't want to version these)
+# app/microservices/exerciselib/migrations/
+
+# Compiled Go binaries
+app/microservices/exerciselib/bin/
+
+# Frontend build
+app/microservices/frontend/build/
+app/microservices/frontend/dist/
+app/microservices/frontend/node_modules/

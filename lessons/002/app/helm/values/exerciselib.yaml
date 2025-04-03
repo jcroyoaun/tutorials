@@ -1,0 +1,65 @@
+service:
+  name: exerciselib
+  replicas: 1
+
+  container:
+    image: jcroyoaun/exerciselib
+    tag: latest
+    port: 4000
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2000Mi
+      requests:
+        cpu: "1"
+        memory: "2000Mi"
+    probes:
+      startup:
+        path: /v1/healthcheck
+      liveness:
+        path: /v1/healthcheck
+    envFrom:
+      - secretRef:
+          name: exerciselib-secrets
+
+  secretData:
+    EXERCISELIB_DB_DSN: postgres://exerciselib:pa55word@postgres-svc.postgres/exerciselib?sslmode=disable
+
+  networkPolicy:
+    enabled: true
+    ingress:
+      - fromEndpoints:
+          - matchLabels:
+              io.kubernetes.pod.namespace: kube-system
+              k8s-app: kube-dns
+        toPorts:
+          - ports:
+              - port: "53"
+                protocol: UDP
+              - port: "53"
+                protocol: TCP
+            rules:
+              dns:
+                - matchPattern: "*"
+      - fromEndpoints:
+          - matchLabels:
+              app: exerciselib
+              io.kubernetes.pod.namespace: exerciselib
+        toPorts:
+          - ports:
+              - port: "5432"
+                protocol: TCP
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              io.kubernetes.pod.namespace: kube-system
+              k8s-app: kube-dns
+        toPorts:
+          - ports:
+              - port: "53"
+                protocol: UDP
+              - port: "53"
+                protocol: TCP
+            rules:
+              dns:
+                - matchPattern: "*"

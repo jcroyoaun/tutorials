@@ -1,0 +1,14 @@
+{{- if and (eq .Release.Name "postgres") .Values.service.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - {{ .Values.service.persistence.accessMode | default "ReadWriteOnce" }}
+  storageClassName: {{ .Values.service.persistence.storageClass | default "gp3" }}
+  resources:
+    requests:
+      storage: {{ .Values.service.persistence.size | default "10Gi" }}
+{{- end }}

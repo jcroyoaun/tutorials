@@ -1,0 +1,27 @@
+{
+  "name": "002",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "tsc",
+    "cdk": "cdk"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-cdk/aws-eks-v2-alpha": "^2.187.0-alpha.0",
+    "@aws-cdk/lambda-layer-kubectl-v32": "^2.1.0",
+    "aws-cdk-lib": "^2.187.0",
+    "constructs": "^10.4.2",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "ts-node": "^10.9.2"
+  }
+}
