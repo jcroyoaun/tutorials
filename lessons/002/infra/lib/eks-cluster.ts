@@ -21,7 +21,7 @@ export class EksV2ClusterStack extends cdk.Stack {
           subnetType: ec2.SubnetType.PUBLIC,
         },
         {
-          cidrMask: 24,
+          cidrMask: 20,
           name: 'private',
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         }
