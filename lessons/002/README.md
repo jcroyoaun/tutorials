@@ -3,14 +3,14 @@
 This demo was presented on Kubernetes Community Day in GDL Mexico (2025 edition), and its purpose is to explain how to use Cilium on an EKS cluster in combination with the AWS VPC CNI plugin.
 
 ## Pre-requisites:
-* Cilium CLI - The installation guide for Cilium CLI can be found [!here|https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli]
+* Cilium CLI - The installation guide for Cilium CLI can be found [here](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)
 
-# Hubble CLI - The Installation guide for Hubble CLI can be found [!here|https://docs.cilium.io/en/stable/observability/hubble/setup/#install-the-hubble-client]
-```
+* Hubble CLI - The Installation guide for Hubble CLI can be found [here](https://docs.cilium.io/en/stable/observability/hubble/setup/#install-the-hubble-client)
 
-* npm and cdk - The EKS cluster in this demo is installed by CDK (along with Cilium installation). My blog has a tutorial on how to install npm in what I consider the "correct" way [!install npm|https://medium.com/@jcroyoaun/my-quick-typescript-setup-guide-748437193d64]. 
+
+* npm and cdk - The EKS cluster in this demo is installed by CDK (along with Cilium installation). My blog has a tutorial on how to install npm in what I consider the "correct" way: [install npm](https://medium.com/@jcroyoaun/my-quick-typescript-setup-guide-748437193d64)
 * * After npm has been installed, cdk installation is needed. To install cdk simply do
-```
+```bash
 npm -g cdk
 ```
 
@@ -26,7 +26,7 @@ cd infra
 ```
 
 2. Set your AWS acconut and region defaults:
-```
+```bash
 export CDK_DEFAULT_REGION="us-east-1"
 export CDK_DEFAULT_ACCOUNT="<youraccountnumber>" #12345678
 ```
@@ -53,7 +53,7 @@ The CDK code contains a Cilium installation that works in EKS, as it chains Cili
 * https://docs.cilium.io/en/stable/installation/cni-chaining-aws-cni/
 
 To verify Cilium was deployed:
-```
+```bash
 ❯ k get pods -n kube-system | grep cilium
 cilium-envoy-ncj76                                                1/1     Running   0          3h48m
 cilium-envoy-tj2bg                                                1/1     Running   0          3h48m
