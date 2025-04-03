@@ -60,7 +60,7 @@ export class EksV2ClusterStack extends cdk.Stack {
     const cluster = new eks.Cluster(this, 'EksCluster', {
       version: eks.KubernetesVersion.V1_32,
       vpc,
-      // clusterName: 'kcd-gdl-demo',
+      clusterName: 'kcd-gdl-demo',
       vpcSubnets: [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }],
       defaultCapacityType: eks.DefaultCapacityType.NODEGROUP,
       defaultCapacity: 0, // We'll create the node group ourselves
