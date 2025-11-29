@@ -1,0 +1,103 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform plan files
+*.tfplan
+*.plan
+
+# Sensitive files
+secrets.tf
+secrets.tfvars
+*.pem
+*.key
+*.crt
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+vendor/
+__debug_bin*
+
+# Binary output
+/app/resource-hog
+/app/main
+
+# Build artifacts
+dist/
+build/
+bin/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.bak
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+.kube/
+
+# AWS
+.aws/
+*.pem
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Coverage and test reports
+coverage.out
+coverage.html
+*.cover
+*.test.cache
+

@@ -1,0 +1,63 @@
+# GUARANTEED QoS Class
+# Criteria: Every container has memory/cpu limit == request
+# Eviction priority: LAST (most protected)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hog-guaranteed
+  namespace: qos-demo
+  labels:
+    app: resource-hog
+    qos: guaranteed
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: resource-hog
+      qos: guaranteed
+  template:
+    metadata:
+      labels:
+        app: resource-hog
+        qos: guaranteed
+    spec:
+      containers:
+      - name: resource-hog
+        image: 443311183770.dkr.ecr.us-east-1.amazonaws.com/resource-hog:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        # GUARANTEED: requests == limits
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
+          limits:
+            memory: "1024Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hog-guaranteed
+  namespace: qos-demo
+spec:
+  selector:
+    app: resource-hog
+    qos: guaranteed
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http

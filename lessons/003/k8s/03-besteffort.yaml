@@ -1,0 +1,56 @@
+# BESTEFFORT QoS Class
+# Criteria: NO requests, NO limits
+# Eviction priority: FIRST (gets fucked first)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hog-besteffort
+  namespace: qos-demo
+  labels:
+    app: resource-hog
+    qos: besteffort
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resource-hog
+      qos: besteffort
+  template:
+    metadata:
+      labels:
+        app: resource-hog
+        qos: besteffort
+    spec:
+      containers:
+      - name: resource-hog
+        image: 443311183770.dkr.ecr.us-east-1.amazonaws.com/resource-hog:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        # BESTEFFORT: No resources block at all!
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hog-besteffort
+  namespace: qos-demo
+spec:
+  selector:
+    app: resource-hog
+    qos: besteffort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http

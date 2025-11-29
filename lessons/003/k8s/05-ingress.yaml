@@ -1,0 +1,64 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: resource-hog-ingress
+  namespace: qos-demo
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    external-dns.alpha.kubernetes.io/hostname: resourcehog.jcroyoaun.com,chaos.resourcehog.jcroyoaun.com,guaranteed.resourcehog.jcroyoaun.com,burstable.resourcehog.jcroyoaun.com,besteffort.resourcehog.jcroyoaun.com
+spec:
+  ingressClassName: alb
+  rules:
+  - host: resourcehog.jcroyoaun.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hog-troublemaker
+            port:
+              number: 8080
+  - host: chaos.resourcehog.jcroyoaun.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hog-troublemaker
+            port:
+              number: 8080
+  - host: guaranteed.resourcehog.jcroyoaun.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hog-guaranteed
+            port:
+              number: 8080
+  - host: burstable.resourcehog.jcroyoaun.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hog-burstable
+            port:
+              number: 8080
+  - host: besteffort.resourcehog.jcroyoaun.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hog-besteffort
+            port:
+              number: 8080

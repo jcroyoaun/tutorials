@@ -1,0 +1,63 @@
+# BURSTABLE QoS Class
+# Criteria: Has requests, but limits > requests
+# Eviction priority: MIDDLE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hog-burstable
+  namespace: qos-demo
+  labels:
+    app: resource-hog
+    qos: burstable
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resource-hog
+      qos: burstable
+  template:
+    metadata:
+      labels:
+        app: resource-hog
+        qos: burstable
+    spec:
+      containers:
+      - name: resource-hog
+        image: 443311183770.dkr.ecr.us-east-1.amazonaws.com/resource-hog:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        # BURSTABLE: requests < limits (4x overcommit on memory!)
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hog-burstable
+  namespace: qos-demo
+spec:
+  selector:
+    app: resource-hog
+    qos: burstable
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
