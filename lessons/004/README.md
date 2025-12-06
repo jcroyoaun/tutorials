@@ -20,3 +20,7 @@ Es un sistema de **Service Discovery en tiempo real para Kubernetes** que simpli
 
 <img width="1024" height="642" alt="k8s-level-diagram" src="https://github.com/user-attachments/assets/49fe9fa8-64ea-4506-9400-bc503b3dd41d" />
 
+
+
+PDF con los slides presentados en la charla:
+[go-k8-charla.pdf](https://github.com/user-attachments/files/23994478/go-k8-charla.pdf)
