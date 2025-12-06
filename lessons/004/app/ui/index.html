@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posadev Service Discovery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+                    <path d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-title">Posadev</span>
+                <span class="logo-subtitle">Service Discovery</span>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="status-indicator" id="status">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+            <div class="last-updated" id="lastUpdated">--</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-value" id="totalNamespaces">-</div>
+                <div class="stat-label">Namespaces</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalServices">-</div>
+                <div class="stat-label">Services</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="uniqueVersions">-</div>
+                <div class="stat-label">Unique Versions</div>
+            </div>
+        </div>
+
+        <div class="namespaces-grid" id="namespacesGrid">
+            <!-- Namespaces will be injected here -->
+        </div>
+
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p>Fetching service data...</p>
+        </div>
+
+        <div class="error-state" id="errorState" style="display: none;">
+            <div class="error-icon">⚠️</div>
+            <h3>Unable to load services</h3>
+            <p id="errorMessage">Please check your connection and try again.</p>
+            <button onclick="loadData()" class="retry-btn">Retry</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>Powered by <strong>Go Sentinel</strong> • Real-time Kubernetes Service Discovery</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

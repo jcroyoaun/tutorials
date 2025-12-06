@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-sentinel-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: posadev-go-sentinel
+    app.kubernetes.io/component: config
+data:
+  # S3 bucket name for storing discovery.json
+  S3_BUCKET: "posadev-go-sentinel"
+  
+  # File name to store in S3
+  S3_FILE_NAME: "discovery.json"
+  
+  # Comma-separated list of namespaces to ignore
+  # Example: "kube-system,kube-public,kube-node-lease"
+  IGNORED_NAMESPACES: "kube-system,kube-public,kube-node-lease"
+
